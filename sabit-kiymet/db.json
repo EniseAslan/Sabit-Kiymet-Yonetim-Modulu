@@ -1,0 +1,42 @@
+{
+  "sabitKiymetler": [
+    {
+      "id": 1,
+      "ad": "Merkez Ofis Binası",
+      "kategori": "BINA",
+      "alisTarihi": "2018-03-15",
+      "alisBedeli": 2500000,
+      "amortismanOrani": 2,
+      "durum": "AKTIF",
+      "subeId": 1,
+      "subeAdi": "İstanbul Merkez"
+    },
+    {
+      "id": 2,
+      "ad": "Servis Aracı",
+      "kategori": "TASIT",
+      "alisTarihi": "2021-06-01",
+      "alisBedeli": 950000,
+      "amortismanOrani": 20,
+      "durum": "AKTIF",
+      "subeId": 2,
+      "subeAdi": "Ankara Şube"
+    },
+    {
+      "id": 3,
+      "ad": "Insaat Makinasi",
+      "kategori": "MAKINA",
+      "alisTarihi": "2022-09-10",
+      "alisBedeli": 450000,
+      "amortismanOrani": 25,
+      "durum": "HURDA",
+      "subeId": 1,
+      "subeAdi": "Elazığ Merkez"
+    }
+  ],
+  "subeler": [
+    { "id": 1, "adi": "İstanbul Merkez" },
+    { "id": 2, "adi": "Edirne Şube" },
+    { "id": 3, "adi": "Elazığ Şube" }
+  ]
+}
