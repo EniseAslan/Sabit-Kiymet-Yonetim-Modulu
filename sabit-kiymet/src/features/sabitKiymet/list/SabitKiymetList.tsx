@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getSabitKiymetler } from '../../../api/sabitKiymet.api';
-import type { SabitKiymet } from '../../../types/sabitKiymet.types';
+import {
+  DURUM_LABEL,
+  KATEGORI_LABEL,
+  KATEGORI_OPTIONS,
+  type SabitKiymet,
+} from '../../../types/sabitKiymet.types';
 
 function SabitKiymetList() {
   const [items, setItems] = useState<SabitKiymet[]>([]);
@@ -29,10 +34,21 @@ function SabitKiymetList() {
     <div>
       <h1>Sabit Kıymetler</h1>
       <Link to="/sabit-kiymet/yeni">Yeni</Link>
+
+      <select>
+        {KATEGORI_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+
       <ul>
         {items.map((item) => (
           <li key={item.id}>
             <Link to={`/sabit-kiymet/${item.id}`}>{item.ad}</Link>
+            {' — '}
+            {KATEGORI_LABEL[item.kategori]} · {DURUM_LABEL[item.durum]}
           </li>
         ))}
       </ul>
