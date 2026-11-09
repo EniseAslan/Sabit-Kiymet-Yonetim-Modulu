@@ -25,13 +25,24 @@
     {
       "id": 3,
       "ad": "Insaat Makinasi",
-      "kategori": "MAKINA",
+      "kategori": "MAKINE",
       "alisTarihi": "2022-09-10",
       "alisBedeli": 450000,
       "amortismanOrani": 25,
       "durum": "HURDA",
       "subeId": 1,
       "subeAdi": "Elazığ Merkez"
+    },
+     {
+      "id": 4,
+      "ad": "Masa",
+      "kategori": "DEMİRBAS",
+      "alisTarihi": "2023-09-14",
+      "alisBedeli": 1200,
+      "amortismanOrani": 25,
+      "durum": "HURDA",
+      "subeId": 3,
+      "subeAdi": "Edirne Merkez"
     }
   ],
   "subeler": [
