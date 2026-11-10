@@ -24,7 +24,7 @@
     },
     {
       "id": 3,
-      "ad": "Insaat Makinasi",
+      "ad": "Insaat Makinesi",
       "kategori": "MAKINE",
       "alisTarihi": "2022-09-10",
       "alisBedeli": 450000,
@@ -36,14 +36,25 @@
      {
       "id": 4,
       "ad": "Masa",
-      "kategori": "DEMİRBAS",
+      "kategori": "DEMIRBAS",
       "alisTarihi": "2023-09-14",
       "alisBedeli": 1200,
       "amortismanOrani": 25,
       "durum": "HURDA",
       "subeId": 3,
       "subeAdi": "Edirne Merkez"
-    }
+    },
+    {
+  "id": 5,
+  "ad": "Depo Raf Sistemi",
+  "kategori": "DEMIRBAS",
+  "alisTarihi": "2023-04-05",
+  "alisBedeli": 120000,
+  "amortismanOrani": 10,
+  "durum": "AKTIF",
+  "subeId": 3,
+  "subeAdi": "İzmir Şube"
+}
   ],
   "subeler": [
     { "id": 1, "adi": "İstanbul Merkez" },
