@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getSabitKiymetler } from '../../../api/sabitKiymet.api';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  deleteSabitKiymet,
+  getSabitKiymetler,
+} from "../../../api/sabitKiymet.api";
+import Notification from "../../../components/Notification";
 import {
   DURUM_LABEL,
   DURUM_OPTIONS,
@@ -9,19 +13,20 @@ import {
   type Durum,
   type Kategori,
   type SabitKiymet,
-} from '../../../types/sabitKiymet.types';
+} from "../../../types/sabitKiymet.types";
 
-type KategoriFilter = Kategori | 'ALL';
-type DurumFilter = Durum | 'ALL';
+type KategoriFilter = Kategori | "ALL";
+type DurumFilter = Durum | "ALL";
 
 function SabitKiymetList() {
   const [items, setItems] = useState<SabitKiymet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
 
-  const [search, setSearch] = useState<string>('');
-  const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>('ALL');
-  const [durumFilter, setDurumFilter] = useState<DurumFilter>('ALL');
+  const [search, setSearch] = useState<string>("");
+  const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>("ALL");
+  const [durumFilter, setDurumFilter] = useState<DurumFilter>("ALL");
 
   useEffect(() => {
     const load = async () => {
@@ -29,7 +34,7 @@ function SabitKiymetList() {
         const data = await getSabitKiymetler();
         setItems(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+        setError(err instanceof Error ? err.message : "Bilinmeyen hata");
       } finally {
         setLoading(false);
       }
@@ -37,13 +42,33 @@ function SabitKiymetList() {
     load();
   }, []);
 
+  useEffect(() => {
+    if (!notification) return;
+    const t = setTimeout(() => setNotification(null), 3000);
+    return () => clearTimeout(t);
+  }, [notification]);
+
+  const handleDelete = async (id: number) => {
+    const ok = window.confirm("Bu kaydı silmek istediğinize emin misiniz?");
+    if (!ok) return;
+
+    try {
+      await deleteSabitKiymet(id);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      setNotification("Kayıt silindi");
+      setTimeout(() => setNotification(null), 3000);
+    } catch {
+      window.alert("Silme işlemi başarısız.");
+    }
+  };
+
   const filtered = items.filter((item) => {
     const matchesSearch = item.ad
-      .toLocaleLowerCase('tr-TR')
-      .includes(search.toLocaleLowerCase('tr-TR'));
+      .toLocaleLowerCase("tr-TR")
+      .includes(search.toLocaleLowerCase("tr-TR"));
     const matchesKategori =
-      kategoriFilter === 'ALL' || item.kategori === kategoriFilter;
-    const matchesDurum = durumFilter === 'ALL' || item.durum === durumFilter;
+      kategoriFilter === "ALL" || item.kategori === kategoriFilter;
+    const matchesDurum = durumFilter === "ALL" || item.durum === durumFilter;
     return matchesSearch && matchesKategori && matchesDurum;
   });
 
@@ -53,7 +78,12 @@ function SabitKiymetList() {
   return (
     <div>
       <h1>Sabit Kıymetler</h1>
-
+      {notification && (
+        <Notification
+          message={notification}
+          onClose={() => setNotification(null)}
+        />
+      )}
       <div>
         <Link to="/sabit-kiymet/yeni">Yeni</Link>
 
@@ -112,16 +142,17 @@ function SabitKiymetList() {
                 <td>{item.ad}</td>
                 <td>{KATEGORI_LABEL[item.kategori]}</td>
                 <td>{DURUM_LABEL[item.durum]}</td>
-                <td>{new Date(item.alisTarihi).toLocaleDateString('tr-TR')}</td>
+                <td>{new Date(item.alisTarihi).toLocaleDateString("tr-TR")}</td>
                 <td>
-                  {item.alisBedeli.toLocaleString('tr-TR', {
-                    style: 'currency',
-                    currency: 'TRY',
+                  {item.alisBedeli.toLocaleString("tr-TR", {
+                    style: "currency",
+                    currency: "TRY",
                   })}
                 </td>
                 <td>{item.subeAdi}</td>
                 <td>
                   <Link to={`/sabit-kiymet/${item.id}`}>Düzenle</Link>
+                  <button onClick={() => handleDelete(item.id)}>Sil</button>
                 </td>
               </tr>
             ))

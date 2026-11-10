@@ -9,3 +9,12 @@ export async function getSabitKiymetler(): Promise<SabitKiymet[]> {
   }
   return res.json();
 }
+
+export async function deleteSabitKiymet(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/sabitKiymetler/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+}
