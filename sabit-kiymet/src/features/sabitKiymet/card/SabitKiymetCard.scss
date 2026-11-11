@@ -1,0 +1,126 @@
+@use '../../../styles/base' as *;
+
+.sabit-kiymet-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $space-md;
+
+    h1 {
+      margin: 0;
+    }
+  }
+
+  &__form {
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: $space-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-sm;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: $space-md;
+  }
+}
+
+.genel-bilgiler {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: $color-text-muted;
+    }
+
+    &__error {
+      color: $color-danger;
+      font-size: 12px;
+      margin: 0;
+    }
+  }
+
+  &__branch {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    &__value {
+      flex: 1;
+      padding: $space-sm $space-md;
+      background: $color-bg;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
+      color: $color-text;
+
+      &--empty {
+        color: $color-text-muted;
+        font-style: italic;
+      }
+    }
+  }
+
+  &__amortisman {
+    background: #eff6ff;
+    border-left: 4px solid $color-primary;
+    padding: $space-md;
+    border-radius: $radius-sm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    strong {
+      color: $color-primary;
+      font-size: 16px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sabit-kiymet-card {
+    padding: $space-md;
+
+    &__header {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      gap: $space-sm;
+
+      .btn {
+        align-self: flex-end;
+      }
+    }
+
+    &__form {
+      padding: $space-md;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}

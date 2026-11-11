@@ -54,17 +54,6 @@
       "durum": "AKTIF",
       "subeId": 3,
       "subeAdi": "Elazığ Şube"
-    },
-    {
-      "ad": "deneme",
-      "kategori": "BINA",
-      "alisTarihi": "2026-11-11",
-      "alisBedeli": 500,
-      "amortismanOrani": 10,
-      "durum": "AKTIF",
-      "subeId": 0,
-      "subeAdi": "",
-      "id": 6
     }
   ],
   "subeler": [

@@ -12,7 +12,11 @@ import {
   Kategori,
   type SabitKiymetForm,
 } from '../../../types/sabitKiymet.types';
+import type { Sube } from '../../../types/sube.types';
+import { hesaplaYillikAmortisman } from '../../../utils/_project/sabitKiymet';
 import GenelBilgiler from './GenelBilgiler';
+import SubeModal from '../modal/SubeModal';
+import './SabitKiymetCard.scss';
 
 const validationSchema = Yup.object({
   ad: Yup.string().trim().required('Ad zorunludur'),
@@ -25,7 +29,7 @@ const validationSchema = Yup.object({
 const EMPTY_FORM: SabitKiymetForm = {
   ad: '',
   kategori: Kategori.Bina,
-  alisTarihi: new Date().toISOString().slice(0, 10), 
+  alisTarihi: new Date().toISOString().slice(0, 10),
   alisBedeli: 0,
   amortismanOrani: 0,
   durum: Durum.Aktif,
@@ -40,6 +44,7 @@ function SabitKiymetCard() {
 
   const [loading, setLoading] = useState<boolean>(!isNew);
   const [error, setError] = useState<string | null>(null);
+  const [subeModalOpen, setSubeModalOpen] = useState<boolean>(false);
 
   const formik = useFormik<SabitKiymetForm>({
     initialValues: EMPTY_FORM,
@@ -76,35 +81,74 @@ function SabitKiymetCard() {
     load();
   }, [id, isNew, setValues]);
 
-
   const yillikAmortisman = useMemo(
-    () => (formik.values.alisBedeli * formik.values.amortismanOrani) / 100,
+    () =>
+      hesaplaYillikAmortisman(
+        formik.values.alisBedeli,
+        formik.values.amortismanOrani,
+      ),
     [formik.values.alisBedeli, formik.values.amortismanOrani],
   );
 
+  const handleSubeSelect = (sube: Sube) => {
+    formik.setValues({
+      ...formik.values,
+      subeId: sube.id,
+      subeAdi: sube.adi,
+    });
+  };
+
   if (loading) return <p>Yükleniyor…</p>;
+
   if (error) {
     return (
-      <div>
-        <p>Hata: {error}</p>
-        <Link to="/sabit-kiymet">← Listeye dön</Link>
+      <div className="sabit-kiymet-card">
+        <div className="sabit-kiymet-card__header">
+          <h1>Hata</h1>
+          <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+            ← Listeye dön
+          </Link>
+        </div>
+        <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <Link to="/sabit-kiymet">← Listeye dön</Link>
-      <h1>{isNew ? 'Yeni Sabit Kıymet' : `Sabit Kıymet #${id}`}</h1>
+    <div className="sabit-kiymet-card">
+      <div className="sabit-kiymet-card__header">
+        <h1>{isNew ? 'Yeni Sabit Kıymet' : `Sabit Kıymet #${id}`}</h1>
+        <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+          ← Listeye dön
+        </Link>
+      </div>
 
-      <form onSubmit={formik.handleSubmit}>
-        <GenelBilgiler formik={formik} yillikAmortisman={yillikAmortisman} />
+      <form onSubmit={formik.handleSubmit} className="sabit-kiymet-card__form">
+        <GenelBilgiler
+          formik={formik}
+          yillikAmortisman={yillikAmortisman}
+          onSubeSecClick={() => setSubeModalOpen(true)}
+        />
 
-        <button type="submit" disabled={formik.isSubmitting}>
-          Kaydet
-        </button>
-        <Link to="/sabit-kiymet">İptal</Link>
+        <div className="sabit-kiymet-card__actions">
+          <Link to="/sabit-kiymet" className="btn btn--secondary">
+            İptal
+          </Link>
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={formik.isSubmitting}
+          >
+            Kaydet
+          </button>
+        </div>
       </form>
+
+      <SubeModal
+        open={subeModalOpen}
+        onClose={() => setSubeModalOpen(false)}
+        onSelect={handleSubeSelect}
+      />
     </div>
   );
 }

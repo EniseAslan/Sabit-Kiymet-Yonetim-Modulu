@@ -1,0 +1,80 @@
+@use '../../../styles/base' as *;
+
+.sabit-kiymet-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-sm;
+
+    input[type='text'] {
+      flex: 1 1 200px;
+      min-width: 200px;
+    }
+
+    select {
+      flex: 0 0 auto;
+    }
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    background: $color-surface;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th,
+    td {
+      padding: $space-md;
+      text-align: left;
+      border-bottom: 1px solid $color-border;
+    }
+
+    th {
+      background: $color-bg;
+      font-weight: 600;
+      color: $color-text-muted;
+    }
+
+    tbody tr:hover {
+      background: $color-bg;
+    }
+
+    &__actions {
+      display: flex;
+      gap: $space-sm;
+      align-items: center;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sabit-kiymet-list {
+    padding: $space-md;
+
+    &__header {
+      flex-direction: column;
+      gap: $space-sm;
+      align-items: flex-start;
+    }
+  }
+}

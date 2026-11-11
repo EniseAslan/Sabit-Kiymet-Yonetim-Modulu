@@ -38,7 +38,9 @@ function SubeModal({ open, onClose, onSelect }: SubeModalProps) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Şube Seç</h2>
-          <button onClick={onClose}>×</button>
+          <button className="btn btn--ghost" onClick={onClose} aria-label="Kapat">
+            ×
+          </button>
         </div>
 
         {loading && <p>Yükleniyor…</p>}
@@ -53,6 +55,7 @@ function SubeModal({ open, onClose, onSelect }: SubeModalProps) {
                 <li key={sube.id}>
                   <button
                     type="button"
+                    className="btn btn--secondary"
                     onClick={() => {
                       onSelect(sube);
                       onClose();

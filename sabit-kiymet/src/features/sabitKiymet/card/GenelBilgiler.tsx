@@ -4,23 +4,24 @@ import {
   KATEGORI_OPTIONS,
   type SabitKiymetForm,
 } from '../../../types/sabitKiymet.types';
+import { formatPara } from '../../../utils/_project/sabitKiymet';
 
 interface GenelBilgilerProps {
   formik: FormikProps<SabitKiymetForm>;
   yillikAmortisman: number;
-  onSubeSecClick:()=> void;
+  onSubeSecClick: () => void;
 }
 
-
-
-function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgilerProps) {
-
-
+function GenelBilgiler({
+  formik,
+  yillikAmortisman,
+  onSubeSecClick,
+}: GenelBilgilerProps) {
   return (
-    <section>
+    <section className="genel-bilgiler">
       <h2>Genel Bilgiler</h2>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="ad">Ad</label>
         <input
           id="ad"
@@ -30,10 +31,12 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
-        {formik.touched.ad && formik.errors.ad && <p>{formik.errors.ad}</p>}
+        {formik.touched.ad && formik.errors.ad && (
+          <p className="genel-bilgiler__field__error">{formik.errors.ad}</p>
+        )}
       </div>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="kategori">Kategori</label>
         <select
           id="kategori"
@@ -49,7 +52,7 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
         </select>
       </div>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="alisTarihi">Alış Tarihi</label>
         <input
           id="alisTarihi"
@@ -60,7 +63,7 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
         />
       </div>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="alisBedeli">Alış Bedeli (₺)</label>
         <input
           id="alisBedeli"
@@ -72,11 +75,13 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
           onBlur={formik.handleBlur}
         />
         {formik.touched.alisBedeli && formik.errors.alisBedeli && (
-          <p>{formik.errors.alisBedeli}</p>
+          <p className="genel-bilgiler__field__error">
+            {formik.errors.alisBedeli}
+          </p>
         )}
       </div>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="amortismanOrani">Amortisman Oranı (%)</label>
         <input
           id="amortismanOrani"
@@ -88,7 +93,7 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
         />
       </div>
 
-      <div>
+      <div className="genel-bilgiler__field">
         <label htmlFor="durum">Durum</label>
         <select
           id="durum"
@@ -104,29 +109,32 @@ function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgil
         </select>
       </div>
 
-      <div>
-  <label>Şube</label>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-    <span>
-      {formik.values.subeAdi || 'Şube seçilmedi'}
-    </span>
-    <button type="button" onClick={onSubeSecClick}>
-      Şube Seç
-    </button>
-  </div>
-</div>
+      <div className="genel-bilgiler__field">
+        <label>Şube</label>
+        <div className="genel-bilgiler__branch">
+          <span
+            className={`genel-bilgiler__branch__value ${
+              !formik.values.subeAdi
+                ? 'genel-bilgiler__branch__value--empty'
+                : ''
+            }`}
+          >
+            {formik.values.subeAdi || 'Şube seçilmedi'}
+          </span>
+          <button
+            type="button"
+            onClick={onSubeSecClick}
+            className="btn btn--secondary"
+          >
+            Şube Seç
+          </button>
+        </div>
+      </div>
 
-      <p>
-        Yıllık Amortisman:{' '}
-        <strong>
-          {yillikAmortisman.toLocaleString('tr-TR', {
-            style: 'currency',
-            currency: 'TRY',
-          })}
-        </strong>
-      </p>
-
-
+      <div className="genel-bilgiler__amortisman">
+        <span>Yıllık Amortisman</span>
+        <strong>{formatPara(yillikAmortisman)}</strong>
+      </div>
     </section>
   );
 }

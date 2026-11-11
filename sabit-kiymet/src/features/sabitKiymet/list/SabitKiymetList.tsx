@@ -14,6 +14,8 @@ import {
   type Kategori,
   type SabitKiymet,
 } from '../../../types/sabitKiymet.types';
+import { formatPara, formatTarih } from '../../../utils/_project/sabitKiymet';
+import './SabitKiymetList.scss';
 
 type KategoriFilter = Kategori | 'ALL';
 type DurumFilter = Durum | 'ALL';
@@ -28,7 +30,6 @@ function SabitKiymetList() {
   const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>('ALL');
   const [durumFilter, setDurumFilter] = useState<DurumFilter>('ALL');
 
-  
   useEffect(() => {
     const load = async () => {
       try {
@@ -43,14 +44,12 @@ function SabitKiymetList() {
     load();
   }, []);
 
-  
   useEffect(() => {
     if (!notification) return;
     const t = setTimeout(() => setNotification(null), 3000);
     return () => clearTimeout(t);
   }, [notification]);
 
-  
   const handleDelete = async (id: number) => {
     const ok = window.confirm('Bu kaydı silmek istediğinize emin misiniz?');
     if (!ok) return;
@@ -59,13 +58,11 @@ function SabitKiymetList() {
       await deleteSabitKiymet(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
       setNotification('Kayıt silindi');
-      
     } catch {
       window.alert('Silme işlemi başarısız.');
     }
   };
 
- 
   const filtered = items.filter((item) => {
     const matchesSearch = item.ad
       .toLocaleLowerCase('tr-TR')
@@ -80,8 +77,13 @@ function SabitKiymetList() {
   if (error) return <p>Hata: {error}</p>;
 
   return (
-    <div>
-      <h1>Sabit Kıymetler</h1>
+    <div className="sabit-kiymet-list">
+      <div className="sabit-kiymet-list__header">
+        <h1>Sabit Kıymetler</h1>
+        <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
+          + Yeni
+        </Link>
+      </div>
 
       {notification && (
         <Notification
@@ -90,9 +92,7 @@ function SabitKiymetList() {
         />
       )}
 
-      <div>
-        <Link to="/sabit-kiymet/yeni">Yeni</Link>
-
+      <div className="sabit-kiymet-list__filters">
         <input
           type="text"
           placeholder="Ad ara…"
@@ -125,46 +125,55 @@ function SabitKiymetList() {
         </select>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Ad</th>
-            <th>Kategori</th>
-            <th>Durum</th>
-            <th>Alış Tarihi</th>
-            <th>Alış Bedeli</th>
-            <th>Şube</th>
-            <th>İşlemler</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.length === 0 ? (
+      <div className="sabit-kiymet-list__table-wrapper">
+        <table className="sabit-kiymet-list__table">
+          <thead>
             <tr>
-              <td colSpan={7}>Kayıt bulunamadı.</td>
+              <th>Ad</th>
+              <th>Kategori</th>
+              <th>Durum</th>
+              <th>Alış Tarihi</th>
+              <th>Alış Bedeli</th>
+              <th>Şube</th>
+              <th>İşlemler</th>
             </tr>
-          ) : (
-            filtered.map((item) => (
-              <tr key={item.id}>
-                <td>{item.ad}</td>
-                <td>{KATEGORI_LABEL[item.kategori]}</td>
-                <td>{DURUM_LABEL[item.durum]}</td>
-                <td>{new Date(item.alisTarihi).toLocaleDateString('tr-TR')}</td>
-                <td>
-                  {item.alisBedeli.toLocaleString('tr-TR', {
-                    style: 'currency',
-                    currency: 'TRY',
-                  })}
-                </td>
-                <td>{item.subeAdi}</td>
-                <td>
-                  <Link to={`/sabit-kiymet/${item.id}`}>Düzenle</Link>{' '}
-                  <button onClick={() => handleDelete(item.id)}>Sil</button>
-                </td>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={7}>Kayıt bulunamadı.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              filtered.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.ad}</td>
+                  <td>{KATEGORI_LABEL[item.kategori]}</td>
+                  <td>{DURUM_LABEL[item.durum]}</td>
+                  <td>{formatTarih(item.alisTarihi)}</td>
+                  <td>{formatPara(item.alisBedeli)}</td>
+                  <td>{item.subeAdi}</td>
+                  <td>
+                    <div className="sabit-kiymet-list__table__actions">
+                      <Link
+                        to={`/sabit-kiymet/${item.id}`}
+                        className="btn btn--ghost"
+                      >
+                        Düzenle
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="btn btn--danger"
+                      >
+                        Sil
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
