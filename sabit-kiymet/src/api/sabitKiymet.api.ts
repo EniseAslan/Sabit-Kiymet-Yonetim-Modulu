@@ -1,4 +1,4 @@
-import type { SabitKiymet } from '../types/sabitKiymet.types';
+import type { SabitKiymet,SabitKiymetForm } from '../types/sabitKiymet.types';
 
 const BASE_URL = 'http://localhost:3001';
 
@@ -17,4 +17,16 @@ export async function deleteSabitKiymet(id: number): Promise<void> {
   if (!res.ok) {
     throw new Error(`Server error: ${res.status}`);
   }
+}
+
+export async function createSabitKiymet(data: SabitKiymetForm): Promise<SabitKiymet> {
+  const res = await fetch(`${BASE_URL}/sabitKiymetler`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+  return res.json();
 }

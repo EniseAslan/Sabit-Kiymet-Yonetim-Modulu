@@ -47,3 +47,5 @@ export interface SabitKiymet {
   subeId: number;
   subeAdi: string;
 }
+
+export type SabitKiymetForm = Omit<SabitKiymet, 'id'>;

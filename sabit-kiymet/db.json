@@ -33,7 +33,7 @@
       "subeId": 1,
       "subeAdi": "Elazığ Merkez"
     },
-     {
+    {
       "id": 4,
       "ad": "Masa",
       "kategori": "DEMIRBAS",
@@ -45,20 +45,29 @@
       "subeAdi": "Edirne Merkez"
     },
     {
-  "id": 5,
-  "ad": "Depo Raf Sistemi",
-  "kategori": "DEMIRBAS",
-  "alisTarihi": "2023-04-05",
-  "alisBedeli": 120000,
-  "amortismanOrani": 10,
-  "durum": "AKTIF",
-  "subeId": 3,
-  "subeAdi": "İzmir Şube"
-}
+      "id": 5,
+      "ad": "Depo Raf Sistemi",
+      "kategori": "DEMIRBAS",
+      "alisTarihi": "2023-04-05",
+      "alisBedeli": 120000,
+      "amortismanOrani": 10,
+      "durum": "AKTIF",
+      "subeId": 3,
+      "subeAdi": "İzmir Şube"
+    }
   ],
   "subeler": [
-    { "id": 1, "adi": "İstanbul Merkez" },
-    { "id": 2, "adi": "Edirne Şube" },
-    { "id": 3, "adi": "Elazığ Şube" }
+    {
+      "id": 1,
+      "adi": "İstanbul Merkez"
+    },
+    {
+      "id": 2,
+      "adi": "Edirne Şube"
+    },
+    {
+      "id": 3,
+      "adi": "Elazığ Şube"
+    }
   ]
 }
