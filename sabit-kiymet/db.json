@@ -20,18 +20,18 @@
       "amortismanOrani": 20,
       "durum": "AKTIF",
       "subeId": 2,
-      "subeAdi": "Ankara Şube"
+      "subeAdi": "Edirne Şube"
     },
     {
       "id": 3,
-      "ad": "Insaat Makinesi",
+      "ad": "İnşaat Makinesi",
       "kategori": "MAKINE",
       "alisTarihi": "2022-09-10",
       "alisBedeli": 450000,
       "amortismanOrani": 25,
       "durum": "HURDA",
       "subeId": 1,
-      "subeAdi": "Elazığ Merkez"
+      "subeAdi": "İstanbul Merkez"
     },
     {
       "id": 4,
@@ -42,7 +42,7 @@
       "amortismanOrani": 25,
       "durum": "HURDA",
       "subeId": 3,
-      "subeAdi": "Edirne Merkez"
+      "subeAdi": "Elazığ Şube"
     },
     {
       "id": 5,
@@ -53,7 +53,18 @@
       "amortismanOrani": 10,
       "durum": "AKTIF",
       "subeId": 3,
-      "subeAdi": "İzmir Şube"
+      "subeAdi": "Elazığ Şube"
+    },
+    {
+      "ad": "deneme",
+      "kategori": "BINA",
+      "alisTarihi": "2026-11-11",
+      "alisBedeli": 500,
+      "amortismanOrani": 10,
+      "durum": "AKTIF",
+      "subeId": 0,
+      "subeAdi": "",
+      "id": 6
     }
   ],
   "subeler": [

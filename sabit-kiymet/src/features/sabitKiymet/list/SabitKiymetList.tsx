@@ -56,7 +56,6 @@ function SabitKiymetList() {
       await deleteSabitKiymet(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
       setNotification("Kayıt silindi");
-      setTimeout(() => setNotification(null), 3000);
     } catch {
       window.alert("Silme işlemi başarısız.");
     }

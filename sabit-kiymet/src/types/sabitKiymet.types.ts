@@ -48,4 +48,13 @@ export interface SabitKiymet {
   subeAdi: string;
 }
 
-export type SabitKiymetForm = Omit<SabitKiymet, 'id'>;
+export interface SabitKiymetForm {
+  ad: string;
+  kategori: Kategori;
+  alisTarihi: string;
+  alisBedeli: number;
+  amortismanOrani: number;
+  durum: Durum;
+  subeId: number;
+  subeAdi: string;
+}

@@ -1,9 +1,46 @@
-import type { SabitKiymet,SabitKiymetForm } from '../types/sabitKiymet.types';
+import type { SabitKiymet, SabitKiymetForm } from '../types/sabitKiymet.types';
 
 const BASE_URL = 'http://localhost:3001';
 
 export async function getSabitKiymetler(): Promise<SabitKiymet[]> {
   const res = await fetch(`${BASE_URL}/sabitKiymetler`);
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function getSabitKiymet(id: number): Promise<SabitKiymet> {
+  const res = await fetch(`${BASE_URL}/sabitKiymetler/${id}`);
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function createSabitKiymet(
+  data: SabitKiymetForm,
+): Promise<SabitKiymet> {
+  const res = await fetch(`${BASE_URL}/sabitKiymetler`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    throw new Error(`Server error: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function updateSabitKiymet(
+  id: number,
+  data: SabitKiymetForm,
+): Promise<SabitKiymet> {
+  const res = await fetch(`${BASE_URL}/sabitKiymetler/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
   if (!res.ok) {
     throw new Error(`Server error: ${res.status}`);
   }
@@ -17,16 +54,4 @@ export async function deleteSabitKiymet(id: number): Promise<void> {
   if (!res.ok) {
     throw new Error(`Server error: ${res.status}`);
   }
-}
-
-export async function createSabitKiymet(data: SabitKiymetForm): Promise<SabitKiymet> {
-  const res = await fetch(`${BASE_URL}/sabitKiymetler`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) {
-    throw new Error(`Server error: ${res.status}`);
-  }
-  return res.json();
 }

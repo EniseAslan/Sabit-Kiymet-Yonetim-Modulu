@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import SabitKiymetList from './features/sabitKiymet/list/SabitKiymetList';
-import SabitKiymetCard from './features/sabitKiymet/card/sabitKiymetCard';
+import SabitKiymetCard from './features/sabitKiymet/card/SabitKiymetCard';
 
 function App() {
   return (
