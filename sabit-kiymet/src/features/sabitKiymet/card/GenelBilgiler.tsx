@@ -8,9 +8,12 @@ import {
 interface GenelBilgilerProps {
   formik: FormikProps<SabitKiymetForm>;
   yillikAmortisman: number;
+  onSubeSecClick:()=> void;
 }
 
-function GenelBilgiler({ formik, yillikAmortisman }: GenelBilgilerProps) {
+
+
+function GenelBilgiler({ formik, yillikAmortisman, onSubeSecClick }: GenelBilgilerProps) {
 
 
   return (
@@ -100,6 +103,18 @@ function GenelBilgiler({ formik, yillikAmortisman }: GenelBilgilerProps) {
           ))}
         </select>
       </div>
+
+      <div>
+  <label>Şube</label>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <span>
+      {formik.values.subeAdi || 'Şube seçilmedi'}
+    </span>
+    <button type="button" onClick={onSubeSecClick}>
+      Şube Seç
+    </button>
+  </div>
+</div>
 
       <p>
         Yıllık Amortisman:{' '}
