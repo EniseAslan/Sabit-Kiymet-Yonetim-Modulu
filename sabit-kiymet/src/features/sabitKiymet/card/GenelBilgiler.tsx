@@ -17,6 +17,9 @@ function GenelBilgiler({
   yillikAmortisman,
   onSubeSecClick,
 }: GenelBilgilerProps) {
+  const adError = formik.touched.ad && formik.errors.ad;
+  const bedelError = formik.touched.alisBedeli && formik.errors.alisBedeli;
+
   return (
     <section className="genel-bilgiler">
       <h2>Genel Bilgiler</h2>
@@ -30,8 +33,10 @@ function GenelBilgiler({
           value={formik.values.ad}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
+          className={adError ? 'input--error' : ''}
+          aria-invalid={!!adError}
         />
-        {formik.touched.ad && formik.errors.ad && (
+        {adError && (
           <p className="genel-bilgiler__field__error">{formik.errors.ad}</p>
         )}
       </div>
@@ -73,8 +78,10 @@ function GenelBilgiler({
           value={formik.values.alisBedeli}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
+          className={bedelError ? 'input--error' : ''}
+          aria-invalid={!!bedelError}
         />
-        {formik.touched.alisBedeli && formik.errors.alisBedeli && (
+        {bedelError && (
           <p className="genel-bilgiler__field__error">
             {formik.errors.alisBedeli}
           </p>

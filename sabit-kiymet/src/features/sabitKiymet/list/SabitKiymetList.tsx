@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   deleteSabitKiymet,
   getSabitKiymetler,
@@ -20,18 +20,29 @@ import './SabitKiymetList.scss';
 type KategoriFilter = Kategori | 'ALL';
 type DurumFilter = Durum | 'ALL';
 
+type NotificationState = {
+  message: string;
+  type: 'success' | 'error';
+} | null;
+
 function SabitKiymetList() {
   const [items, setItems] = useState<SabitKiymet[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<NotificationState>(null);
 
   const [search, setSearch] = useState<string>('');
   const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>('ALL');
   const [durumFilter, setDurumFilter] = useState<DurumFilter>('ALL');
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+ 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const data = await getSabitKiymetler();
         setItems(data);
@@ -45,10 +56,25 @@ function SabitKiymetList() {
   }, []);
 
   useEffect(() => {
+    const state = location.state as
+      | { message?: string; type?: 'success' | 'error' }
+      | null;
+    if (state?.message) {
+      setNotification({
+        message: state.message,
+        type: state.type ?? 'success',
+      });
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location, navigate]);
+
+
+  useEffect(() => {
     if (!notification) return;
     const t = setTimeout(() => setNotification(null), 3000);
     return () => clearTimeout(t);
   }, [notification]);
+
 
   const handleDelete = async (id: number) => {
     const ok = window.confirm('Bu kaydı silmek istediğinize emin misiniz?');
@@ -57,9 +83,12 @@ function SabitKiymetList() {
     try {
       await deleteSabitKiymet(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
-      setNotification('Kayıt silindi');
+      setNotification({ message: 'Kayıt silindi', type: 'success' });
     } catch {
-      window.alert('Silme işlemi başarısız.');
+      setNotification({
+        message: 'Silme işlemi başarısız',
+        type: 'error',
+      });
     }
   };
 
@@ -74,7 +103,22 @@ function SabitKiymetList() {
   });
 
   if (loading) return <p>Yükleniyor…</p>;
-  if (error) return <p>Hata: {error}</p>;
+
+  if (error) {
+    return (
+      <div className="sabit-kiymet-list">
+        <div className="sabit-kiymet-list__error">
+          <p>Hata: {error}</p>
+          <button
+            className="btn btn--secondary"
+            onClick={() => window.location.reload()}
+          >
+            Yeniden dene
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sabit-kiymet-list">
@@ -87,7 +131,8 @@ function SabitKiymetList() {
 
       {notification && (
         <Notification
-          message={notification}
+          message={notification.message}
+          type={notification.type}
           onClose={() => setNotification(null)}
         />
       )}
@@ -125,55 +170,66 @@ function SabitKiymetList() {
         </select>
       </div>
 
-      <div className="sabit-kiymet-list__table-wrapper">
-        <table className="sabit-kiymet-list__table">
-          <thead>
-            <tr>
-              <th>Ad</th>
-              <th>Kategori</th>
-              <th>Durum</th>
-              <th>Alış Tarihi</th>
-              <th>Alış Bedeli</th>
-              <th>Şube</th>
-              <th>İşlemler</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
+      {items.length === 0 ? (
+        <div className="sabit-kiymet-list__empty">
+          <p>Henüz hiç kayıt yok.</p>
+          <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
+            İlk kaydı ekle
+          </Link>
+        </div>
+      ) : (
+        <div className="sabit-kiymet-list__table-wrapper">
+          <table className="sabit-kiymet-list__table">
+            <thead>
               <tr>
-                <td colSpan={7}>Kayıt bulunamadı.</td>
+                <th>Ad</th>
+                <th>Kategori</th>
+                <th>Durum</th>
+                <th>Alış Tarihi</th>
+                <th>Alış Bedeli</th>
+                <th>Şube</th>
+                <th>İşlemler</th>
               </tr>
-            ) : (
-              filtered.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.ad}</td>
-                  <td>{KATEGORI_LABEL[item.kategori]}</td>
-                  <td>{DURUM_LABEL[item.durum]}</td>
-                  <td>{formatTarih(item.alisTarihi)}</td>
-                  <td>{formatPara(item.alisBedeli)}</td>
-                  <td>{item.subeAdi}</td>
-                  <td>
-                    <div className="sabit-kiymet-list__table__actions">
-                      <Link
-                        to={`/sabit-kiymet/${item.id}`}
-                        className="btn btn--ghost"
-                      >
-                        Düzenle
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="btn btn--danger"
-                      >
-                        Sil
-                      </button>
-                    </div>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>
+                    Arama/filtre kriterlerine uyan kayıt bulunamadı.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                filtered.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.ad}</td>
+                    <td>{KATEGORI_LABEL[item.kategori]}</td>
+                    <td>{DURUM_LABEL[item.durum]}</td>
+                    <td>{formatTarih(item.alisTarihi)}</td>
+                    <td>{formatPara(item.alisBedeli)}</td>
+                    <td>{item.subeAdi || '—'}</td>
+                    <td>
+                      <div className="sabit-kiymet-list__table__actions">
+                        <Link
+                          to={`/sabit-kiymet/${item.id}`}
+                          className="btn btn--ghost"
+                        >
+                          Düzenle
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="btn btn--danger"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

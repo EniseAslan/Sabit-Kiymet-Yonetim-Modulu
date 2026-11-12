@@ -176,6 +176,30 @@ select {
   }
 }
 
+.input--error {
+  border-color: $color-danger !important;
+
+  &:focus {
+    outline-color: $color-danger;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-xl;
+  background: $color-surface;
+  border: 1px dashed $color-border;
+  border-radius: $radius-md;
+  text-align: center;
+  color: $color-text-muted;
+
+  p {
+    margin: 0 0 $space-md;
+  }
+}
 
 .notification {
   display: flex;

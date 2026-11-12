@@ -65,6 +65,27 @@
       align-items: center;
     }
   }
+
+    &__empty {
+    @extend .empty-state;
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-md;
+    padding: $space-xl;
+    background: $color-surface;
+    border: 1px solid $color-danger;
+    border-radius: $radius-md;
+    text-align: center;
+
+    p {
+      color: $color-danger;
+      margin: 0;
+    }
+  }
 }
 
 @media (max-width: 768px) {

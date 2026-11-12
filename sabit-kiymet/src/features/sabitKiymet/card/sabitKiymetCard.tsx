@@ -14,6 +14,7 @@ import {
 } from '../../../types/sabitKiymet.types';
 import type { Sube } from '../../../types/sube.types';
 import { hesaplaYillikAmortisman } from '../../../utils/_project/sabitKiymet';
+import Notification from '../../../components/Notification';
 import GenelBilgiler from './GenelBilgiler';
 import SubeModal from '../modal/SubeModal';
 import './SabitKiymetCard.scss';
@@ -37,6 +38,11 @@ const EMPTY_FORM: SabitKiymetForm = {
   subeAdi: '',
 };
 
+type NotificationState = {
+  message: string;
+  type: 'success' | 'error';
+} | null;
+
 function SabitKiymetCard() {
   const { id } = useParams();
   const isNew = id === undefined;
@@ -44,7 +50,9 @@ function SabitKiymetCard() {
 
   const [loading, setLoading] = useState<boolean>(!isNew);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState<boolean>(false);
   const [subeModalOpen, setSubeModalOpen] = useState<boolean>(false);
+  const [notification, setNotification] = useState<NotificationState>(null);
 
   const formik = useFormik<SabitKiymetForm>({
     initialValues: EMPTY_FORM,
@@ -53,12 +61,20 @@ function SabitKiymetCard() {
       try {
         if (isNew) {
           await createSabitKiymet(values);
+          navigate('/sabit-kiymet', {
+            state: { message: 'Kayıt eklendi', type: 'success' },
+          });
         } else {
           await updateSabitKiymet(Number(id), values);
+          navigate('/sabit-kiymet', {
+            state: { message: 'Kayıt güncellendi', type: 'success' },
+          });
         }
-        navigate('/sabit-kiymet');
       } catch {
-        window.alert('Kayıt başarısız oldu.');
+        setNotification({
+          message: 'Kayıt başarısız oldu. Lütfen tekrar deneyin.',
+          type: 'error',
+        });
       }
     },
   });
@@ -69,17 +85,30 @@ function SabitKiymetCard() {
     if (isNew) return;
 
     const load = async () => {
+      setLoading(true);
+      setError(null);
+      setNotFound(false);
       try {
         const data = await getSabitKiymet(Number(id));
         setValues(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+        if (err instanceof Error && err.message.includes('404')) {
+          setNotFound(true);
+        } else {
+          setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+        }
       } finally {
         setLoading(false);
       }
     };
     load();
   }, [id, isNew, setValues]);
+
+  useEffect(() => {
+    if (!notification) return;
+    const t = setTimeout(() => setNotification(null), 3000);
+    return () => clearTimeout(t);
+  }, [notification]);
 
   const yillikAmortisman = useMemo(
     () =>
@@ -99,6 +128,20 @@ function SabitKiymetCard() {
   };
 
   if (loading) return <p>Yükleniyor…</p>;
+
+  if (notFound) {
+    return (
+      <div className="sabit-kiymet-card">
+        <div className="sabit-kiymet-card__header">
+          <h1>Kayıt Bulunamadı</h1>
+          <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+            ← Listeye dön
+          </Link>
+        </div>
+        <p>Bu ID ile bir sabit kıymet kaydı bulunamadı.</p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -123,6 +166,14 @@ function SabitKiymetCard() {
         </Link>
       </div>
 
+      {notification && (
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
       <form onSubmit={formik.handleSubmit} className="sabit-kiymet-card__form">
         <GenelBilgiler
           formik={formik}
@@ -139,7 +190,7 @@ function SabitKiymetCard() {
             className="btn btn--primary"
             disabled={formik.isSubmitting}
           >
-            Kaydet
+            {formik.isSubmitting ? 'Kaydediliyor…' : 'Kaydet'}
           </button>
         </div>
       </form>
