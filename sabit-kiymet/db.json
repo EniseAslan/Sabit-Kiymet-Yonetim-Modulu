@@ -54,6 +54,17 @@
       "durum": "AKTIF",
       "subeId": 3,
       "subeAdi": "Elazığ Şube"
+    },
+    {
+      "ad": "Çalışma Masası Takımı",
+      "kategori": "DEMIRBAS",
+      "alisTarihi": "2026-11-02",
+      "alisBedeli": 2998,
+      "amortismanOrani": 20,
+      "durum": "HURDA",
+      "subeId": 2,
+      "subeAdi": "Edirne Şube",
+      "id": 6
     }
   ],
   "subeler": [

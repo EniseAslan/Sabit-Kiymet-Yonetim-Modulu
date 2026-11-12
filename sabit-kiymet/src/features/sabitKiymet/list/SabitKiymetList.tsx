@@ -15,6 +15,7 @@ import {
   type SabitKiymet,
 } from '../../../types/sabitKiymet.types';
 import { formatPara, formatTarih } from '../../../utils/_project/sabitKiymet';
+import SabitKiymetCard from '../card/SabitKiymetCardTemp';
 import './SabitKiymetList.scss';
 
 type KategoriFilter = Kategori | 'ALL';
@@ -34,25 +35,24 @@ function SabitKiymetList() {
   const [search, setSearch] = useState<string>('');
   const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>('ALL');
   const [durumFilter, setDurumFilter] = useState<DurumFilter>('ALL');
+  const [hizliEkleOpen, setHizliEkleOpen] = useState<boolean>(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
- 
+  const loadItems = async () => {
+    try {
+      const data = await getSabitKiymetler();
+      setItems(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getSabitKiymetler();
-        setItems(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadItems();
   }, []);
 
   useEffect(() => {
@@ -68,13 +68,11 @@ function SabitKiymetList() {
     }
   }, [location, navigate]);
 
-
   useEffect(() => {
     if (!notification) return;
     const t = setTimeout(() => setNotification(null), 3000);
     return () => clearTimeout(t);
   }, [notification]);
-
 
   const handleDelete = async (id: number) => {
     const ok = window.confirm('Bu kaydı silmek istediğinize emin misiniz?');
@@ -85,11 +83,14 @@ function SabitKiymetList() {
       setItems((prev) => prev.filter((item) => item.id !== id));
       setNotification({ message: 'Kayıt silindi', type: 'success' });
     } catch {
-      setNotification({
-        message: 'Silme işlemi başarısız',
-        type: 'error',
-      });
+      setNotification({ message: 'Silme işlemi başarısız', type: 'error' });
     }
+  };
+
+  const handleHizliEkleSaved = async () => {
+    setHizliEkleOpen(false);
+    setNotification({ message: 'Kayıt eklendi', type: 'success' });
+    await loadItems(); 
   };
 
   const filtered = items.filter((item) => {
@@ -124,9 +125,17 @@ function SabitKiymetList() {
     <div className="sabit-kiymet-list">
       <div className="sabit-kiymet-list__header">
         <h1>Sabit Kıymetler</h1>
-        <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
-          + Yeni
-        </Link>
+        <div className="sabit-kiymet-list__header__actions">
+          <button
+            className="btn btn--secondary"
+            onClick={() => setHizliEkleOpen(true)}
+          >
+            + Hızlı Ekle
+          </button>
+          <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
+            + Yeni
+          </Link>
+        </div>
       </div>
 
       {notification && (
@@ -228,6 +237,35 @@ function SabitKiymetList() {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {hizliEkleOpen && (
+        <div
+          className="modal-overlay"
+          onClick={() => setHizliEkleOpen(false)}
+        >
+          <div
+            className="modal-content modal-content--wide"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2>Hızlı Ekle</h2>
+              <button
+                className="btn btn--ghost"
+                onClick={() => setHizliEkleOpen(false)}
+                aria-label="Kapat"
+              >
+                ×
+              </button>
+            </div>
+
+            <SabitKiymetCard
+              isInModal
+              onSaved={handleHizliEkleSaved}
+              onCancel={() => setHizliEkleOpen(false)}
+            />
+          </div>
         </div>
       )}
     </div>

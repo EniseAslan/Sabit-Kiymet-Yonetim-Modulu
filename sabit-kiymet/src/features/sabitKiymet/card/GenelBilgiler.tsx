@@ -10,18 +10,22 @@ interface GenelBilgilerProps {
   formik: FormikProps<SabitKiymetForm>;
   yillikAmortisman: number;
   onSubeSecClick: () => void;
+  isInModal?: boolean;
 }
 
 function GenelBilgiler({
   formik,
   yillikAmortisman,
   onSubeSecClick,
+  isInModal = false,
 }: GenelBilgilerProps) {
   const adError = formik.touched.ad && formik.errors.ad;
   const bedelError = formik.touched.alisBedeli && formik.errors.alisBedeli;
 
   return (
-    <section className="genel-bilgiler">
+    <section
+      className={`genel-bilgiler ${isInModal ? 'genel-bilgiler--modal' : ''}`}
+    >
       <h2>Genel Bilgiler</h2>
 
       <div className="genel-bilgiler__field">
@@ -80,6 +84,7 @@ function GenelBilgiler({
           onBlur={formik.handleBlur}
           className={bedelError ? 'input--error' : ''}
           aria-invalid={!!bedelError}
+          placeholder="0"
         />
         {bedelError && (
           <p className="genel-bilgiler__field__error">
@@ -97,6 +102,7 @@ function GenelBilgiler({
           step="any"
           value={formik.values.amortismanOrani}
           onChange={formik.handleChange}
+          placeholder="0"
         />
       </div>
 

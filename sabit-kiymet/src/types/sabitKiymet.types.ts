@@ -52,8 +52,8 @@ export interface SabitKiymetForm {
   ad: string;
   kategori: Kategori;
   alisTarihi: string;
-  alisBedeli: number;
-  amortismanOrani: number;
+  alisBedeli: number | '';
+  amortismanOrani: number | '';
   durum: Durum;
   subeId: number;
   subeAdi: string;

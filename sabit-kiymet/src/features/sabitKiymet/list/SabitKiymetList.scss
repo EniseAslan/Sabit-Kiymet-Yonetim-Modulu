@@ -8,11 +8,17 @@
   flex-direction: column;
   gap: $space-md;
 
-  &__header {
+    &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    &__actions {
+      display: flex;
+      gap: $space-sm;
+    }
   }
+
 
   &__filters {
     display: flex;

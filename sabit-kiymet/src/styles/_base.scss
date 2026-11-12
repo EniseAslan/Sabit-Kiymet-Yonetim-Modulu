@@ -249,6 +249,10 @@ select {
   align-items: center;
   margin-bottom: $space-md;
 
+  .modal-content--wide {
+  max-width: 720px;
+}
+
   h2 {
     margin: 0;
   }

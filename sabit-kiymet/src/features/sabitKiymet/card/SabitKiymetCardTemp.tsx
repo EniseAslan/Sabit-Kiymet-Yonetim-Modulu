@@ -1,49 +1,64 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   createSabitKiymet,
   getSabitKiymet,
   updateSabitKiymet,
-} from '../../../api/sabitKiymet.api';
+} from "../../../api/sabitKiymet.api";
 import {
   Durum,
   Kategori,
   type SabitKiymetForm,
-} from '../../../types/sabitKiymet.types';
-import type { Sube } from '../../../types/sube.types';
-import { hesaplaYillikAmortisman } from '../../../utils/_project/sabitKiymet';
-import Notification from '../../../components/Notification';
-import GenelBilgiler from './GenelBilgiler';
-import SubeModal from '../modal/SubeModal';
-import './SabitKiymetCard.scss';
+} from "../../../types/sabitKiymet.types";
+import type { Sube } from "../../../types/sube.types";
+import { hesaplaYillikAmortisman } from "../../../utils/_project/sabitKiymet";
+import Notification from "../../../components/Notification";
+import GenelBilgiler from "./GenelBilgiler";
+import SubeModal from "../modal/SubeModal";
+import "./SabitKiymetCard.scss";
 
 const validationSchema = Yup.object({
-  ad: Yup.string().trim().required('Ad zorunludur'),
+  ad: Yup.string().trim().required("Ad zorunludur"),
   alisBedeli: Yup.number()
-    .typeError('Alış bedeli bir sayı olmalıdır')
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value,
+    )
+    .typeError("Alış bedeli bir sayı olmalıdır")
     .moreThan(0, "Alış bedeli 0'dan büyük olmalıdır")
-    .required('Alış bedeli zorunludur'),
+    .required("Alış bedeli zorunludur"),
 });
 
 const EMPTY_FORM: SabitKiymetForm = {
-  ad: '',
+  ad: "",
   kategori: Kategori.Bina,
   alisTarihi: new Date().toISOString().slice(0, 10),
-  alisBedeli: 0,
-  amortismanOrani: 0,
+  alisBedeli: "",
+  amortismanOrani: "",
   durum: Durum.Aktif,
   subeId: 0,
-  subeAdi: '',
+  subeAdi: "",
 };
 
 type NotificationState = {
   message: string;
-  type: 'success' | 'error';
+  type: "success" | "error";
 } | null;
 
-function SabitKiymetCard() {
+interface SabitKiymetCardProps {
+  isInModal?: boolean;
+
+  onSaved?: () => void;
+
+  onCancel?: () => void;
+}
+
+function SabitKiymetCard({
+  isInModal = false,
+  onSaved,
+  onCancel,
+}: SabitKiymetCardProps) {
   const { id } = useParams();
   const isNew = id === undefined;
   const navigate = useNavigate();
@@ -59,21 +74,32 @@ function SabitKiymetCard() {
     validationSchema,
     onSubmit: async (values) => {
       try {
+        const payload: SabitKiymetForm = {
+          ...values,
+          alisBedeli: Number(values.alisBedeli) || 0,
+          amortismanOrani: Number(values.amortismanOrani) || 0,
+        };
+
         if (isNew) {
-          await createSabitKiymet(values);
-          navigate('/sabit-kiymet', {
-            state: { message: 'Kayıt eklendi', type: 'success' },
-          });
+          await createSabitKiymet(payload);
         } else {
-          await updateSabitKiymet(Number(id), values);
-          navigate('/sabit-kiymet', {
-            state: { message: 'Kayıt güncellendi', type: 'success' },
+          await updateSabitKiymet(Number(id), payload);
+        }
+
+        if (isInModal) {
+          onSaved?.();
+        } else {
+          navigate("/sabit-kiymet", {
+            state: {
+              message: isNew ? "Kayıt eklendi" : "Kayıt güncellendi",
+              type: "success",
+            },
           });
         }
       } catch {
         setNotification({
-          message: 'Kayıt başarısız oldu. Lütfen tekrar deneyin.',
-          type: 'error',
+          message: "Kayıt başarısız oldu. Lütfen tekrar deneyin.",
+          type: "error",
         });
       }
     },
@@ -92,10 +118,10 @@ function SabitKiymetCard() {
         const data = await getSabitKiymet(Number(id));
         setValues(data);
       } catch (err) {
-        if (err instanceof Error && err.message.includes('404')) {
+        if (err instanceof Error && err.message.includes("404")) {
           setNotFound(true);
         } else {
-          setError(err instanceof Error ? err.message : 'Bilinmeyen hata');
+          setError(err instanceof Error ? err.message : "Bilinmeyen hata");
         }
       } finally {
         setLoading(false);
@@ -113,8 +139,8 @@ function SabitKiymetCard() {
   const yillikAmortisman = useMemo(
     () =>
       hesaplaYillikAmortisman(
-        formik.values.alisBedeli,
-        formik.values.amortismanOrani,
+        Number(formik.values.alisBedeli) || 0,
+        Number(formik.values.amortismanOrani) || 0,
       ),
     [formik.values.alisBedeli, formik.values.amortismanOrani],
   );
@@ -134,9 +160,11 @@ function SabitKiymetCard() {
       <div className="sabit-kiymet-card">
         <div className="sabit-kiymet-card__header">
           <h1>Kayıt Bulunamadı</h1>
-          <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
-            ← Listeye dön
-          </Link>
+          {!isInModal && (
+            <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+              ← Listeye dön
+            </Link>
+          )}
         </div>
         <p>Bu ID ile bir sabit kıymet kaydı bulunamadı.</p>
       </div>
@@ -148,9 +176,11 @@ function SabitKiymetCard() {
       <div className="sabit-kiymet-card">
         <div className="sabit-kiymet-card__header">
           <h1>Hata</h1>
-          <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
-            ← Listeye dön
-          </Link>
+          {!isInModal && (
+            <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+              ← Listeye dön
+            </Link>
+          )}
         </div>
         <p>{error}</p>
       </div>
@@ -160,10 +190,12 @@ function SabitKiymetCard() {
   return (
     <div className="sabit-kiymet-card">
       <div className="sabit-kiymet-card__header">
-        <h1>{isNew ? 'Yeni Sabit Kıymet' : `Sabit Kıymet #${id}`}</h1>
-        <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
-          ← Listeye dön
-        </Link>
+        <h1>{isNew ? "Yeni Sabit Kıymet" : `Sabit Kıymet #${id}`}</h1>
+        {!isInModal && (
+          <Link to="/sabit-kiymet" className="btn btn--secondary btn--sm">
+            ← Listeye dön
+          </Link>
+        )}
       </div>
 
       {notification && (
@@ -179,18 +211,29 @@ function SabitKiymetCard() {
           formik={formik}
           yillikAmortisman={yillikAmortisman}
           onSubeSecClick={() => setSubeModalOpen(true)}
+          isInModal={isInModal}
         />
 
         <div className="sabit-kiymet-card__actions">
-          <Link to="/sabit-kiymet" className="btn btn--secondary">
-            İptal
-          </Link>
+          {isInModal ? (
+            <button
+              type="button"
+              className="btn btn--secondary"
+              onClick={onCancel}
+            >
+              İptal
+            </button>
+          ) : (
+            <Link to="/sabit-kiymet" className="btn btn--secondary">
+              İptal
+            </Link>
+          )}
           <button
             type="submit"
             className="btn btn--primary"
             disabled={formik.isSubmitting}
           >
-            {formik.isSubmitting ? 'Kaydediliyor…' : 'Kaydet'}
+            {formik.isSubmitting ? "Kaydediliyor…" : "Kaydet"}
           </button>
         </div>
       </form>
