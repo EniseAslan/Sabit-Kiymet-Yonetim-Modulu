@@ -124,3 +124,78 @@
     }
   }
 }
+
+
+.kart-tabs {
+  display: flex;
+  gap: $space-xs;
+  border-bottom: 2px solid $color-border;
+  margin-bottom: $space-md;
+
+  &__tab {
+    padding: $space-sm $space-md;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: $color-text-muted;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      color: $color-primary;
+    }
+
+    &--active {
+      color: $color-primary;
+      border-bottom-color: $color-primary;
+    }
+  }
+}
+
+
+.sube-bilgileri {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: $color-text-muted;
+    }
+  }
+
+  &__branch {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    &__value {
+      flex: 1;
+      padding: $space-sm $space-md;
+      background: $color-bg;
+      border: 1px solid $color-border;
+      border-radius: $radius-sm;
+      color: $color-text;
+
+      &--empty {
+        color: $color-text-muted;
+        font-style: italic;
+      }
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    color: $color-text-muted;
+    font-style: italic;
+  }
+}

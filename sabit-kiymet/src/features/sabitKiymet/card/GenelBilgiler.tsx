@@ -9,23 +9,14 @@ import { formatPara } from '../../../utils/_project/sabitKiymet';
 interface GenelBilgilerProps {
   formik: FormikProps<SabitKiymetForm>;
   yillikAmortisman: number;
-  onSubeSecClick: () => void;
-  isInModal?: boolean;
 }
 
-function GenelBilgiler({
-  formik,
-  yillikAmortisman,
-  onSubeSecClick,
-  isInModal = false,
-}: GenelBilgilerProps) {
+function GenelBilgiler({ formik, yillikAmortisman }: GenelBilgilerProps) {
   const adError = formik.touched.ad && formik.errors.ad;
   const bedelError = formik.touched.alisBedeli && formik.errors.alisBedeli;
 
   return (
-    <section
-      className={`genel-bilgiler ${isInModal ? 'genel-bilgiler--modal' : ''}`}
-    >
+    <section className="genel-bilgiler">
       <h2>Genel Bilgiler</h2>
 
       <div className="genel-bilgiler__field">
@@ -120,28 +111,6 @@ function GenelBilgiler({
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="genel-bilgiler__field">
-        <label>Şube</label>
-        <div className="genel-bilgiler__branch">
-          <span
-            className={`genel-bilgiler__branch__value ${
-              !formik.values.subeAdi
-                ? 'genel-bilgiler__branch__value--empty'
-                : ''
-            }`}
-          >
-            {formik.values.subeAdi || 'Şube seçilmedi'}
-          </span>
-          <button
-            type="button"
-            onClick={onSubeSecClick}
-            className="btn btn--secondary"
-          >
-            Şube Seç
-          </button>
-        </div>
       </div>
 
       <div className="genel-bilgiler__amortisman">

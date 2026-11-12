@@ -16,6 +16,8 @@ import type { Sube } from "../../../types/sube.types";
 import { hesaplaYillikAmortisman } from "../../../utils/_project/sabitKiymet";
 import Notification from "../../../components/Notification";
 import GenelBilgiler from "./GenelBilgiler";
+import SubeBilgileri from "./SubeBilgileri";
+import KartTabs, { type KartTab } from "./KartTabs";
 import SubeModal from "../modal/SubeModal";
 import "./SabitKiymetCard.scss";
 
@@ -48,9 +50,7 @@ type NotificationState = {
 
 interface SabitKiymetCardProps {
   isInModal?: boolean;
-
   onSaved?: () => void;
-
   onCancel?: () => void;
 }
 
@@ -68,11 +68,29 @@ function SabitKiymetCard({
   const [notFound, setNotFound] = useState<boolean>(false);
   const [subeModalOpen, setSubeModalOpen] = useState<boolean>(false);
   const [notification, setNotification] = useState<NotificationState>(null);
+  const [activeTab, setActiveTab] = useState<KartTab>("genel");
 
   const formik = useFormik<SabitKiymetForm>({
     initialValues: EMPTY_FORM,
     validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { validateForm }) => {
+      const errors = await validateForm();
+      if (errors.ad || errors.alisBedeli) {
+        setActiveTab("genel");
+        return;
+      }
+
+      if (!values.subeAdi) {
+        const shouldContinue = window.confirm(
+          "Şube seçmediniz. Şube seçmeden kaydetmek istediğinize emin misiniz?",
+        );
+
+        if (!shouldContinue) {
+          setActiveTab("sube");
+          return;
+        }
+      }
+
       try {
         const payload: SabitKiymetForm = {
           ...values,
@@ -207,12 +225,18 @@ function SabitKiymetCard({
       )}
 
       <form onSubmit={formik.handleSubmit} className="sabit-kiymet-card__form">
-        <GenelBilgiler
-          formik={formik}
-          yillikAmortisman={yillikAmortisman}
-          onSubeSecClick={() => setSubeModalOpen(true)}
-          isInModal={isInModal}
-        />
+        <KartTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {activeTab === "genel" && (
+          <GenelBilgiler formik={formik} yillikAmortisman={yillikAmortisman} />
+        )}
+
+        {activeTab === "sube" && (
+          <SubeBilgileri
+            formik={formik}
+            onSubeSecClick={() => setSubeModalOpen(true)}
+          />
+        )}
 
         <div className="sabit-kiymet-card__actions">
           {isInModal ? (
