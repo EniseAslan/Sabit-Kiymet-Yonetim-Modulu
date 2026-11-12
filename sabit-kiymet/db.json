@@ -65,6 +65,17 @@
       "subeId": 2,
       "subeAdi": "Edirne Şube",
       "id": 6
+    },
+    {
+      "ad": "PC",
+      "kategori": "DEMIRBAS",
+      "alisTarihi": "2026-11-03",
+      "alisBedeli": 50000,
+      "amortismanOrani": 10,
+      "durum": "AKTIF",
+      "subeId": 2,
+      "subeAdi": "Edirne Şube",
+      "id": 7
     }
   ],
   "subeler": [

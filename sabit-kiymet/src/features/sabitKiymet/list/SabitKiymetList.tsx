@@ -14,12 +14,17 @@ import {
   type Kategori,
   type SabitKiymet,
 } from '../../../types/sabitKiymet.types';
-import { formatPara, formatTarih } from '../../../utils/_project/sabitKiymet';
+import {
+  formatPara,
+  formatTarih,
+  hesaplaYillikAmortisman,
+} from '../../../utils/_project/sabitKiymet';
 import SabitKiymetCard from '../card/SabitKiymetCardTemp';
 import './SabitKiymetList.scss';
 
 type KategoriFilter = Kategori | 'ALL';
 type DurumFilter = Durum | 'ALL';
+type SayfaTab = 'liste' | 'rapor';
 
 type NotificationState = {
   message: string;
@@ -32,9 +37,12 @@ function SabitKiymetList() {
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<NotificationState>(null);
 
+  const [sayfaTab, setSayfaTab] = useState<SayfaTab>('liste');
+
   const [search, setSearch] = useState<string>('');
   const [kategoriFilter, setKategoriFilter] = useState<KategoriFilter>('ALL');
   const [durumFilter, setDurumFilter] = useState<DurumFilter>('ALL');
+
   const [hizliEkleOpen, setHizliEkleOpen] = useState<boolean>(false);
 
   const location = useLocation();
@@ -90,7 +98,7 @@ function SabitKiymetList() {
   const handleHizliEkleSaved = async () => {
     setHizliEkleOpen(false);
     setNotification({ message: 'Kayıt eklendi', type: 'success' });
-    await loadItems(); 
+    await loadItems();
   };
 
   const filtered = items.filter((item) => {
@@ -102,6 +110,12 @@ function SabitKiymetList() {
     const matchesDurum = durumFilter === 'ALL' || item.durum === durumFilter;
     return matchesSearch && matchesKategori && matchesDurum;
   });
+
+  const toplamAlisBedeli = items.reduce((s, i) => s + i.alisBedeli, 0);
+  const toplamYillikAmortisman = items.reduce(
+    (s, i) => s + hesaplaYillikAmortisman(i.alisBedeli, i.amortismanOrani),
+    0,
+  );
 
   if (loading) return <p>Yükleniyor…</p>;
 
@@ -146,91 +160,167 @@ function SabitKiymetList() {
         />
       )}
 
-      <div className="sabit-kiymet-list__filters">
-        <input
-          type="text"
-          placeholder="Ad ara…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <select
-          value={kategoriFilter}
-          onChange={(e) => setKategoriFilter(e.target.value as KategoriFilter)}
+      <div className="sabit-kiymet-list__tabs">
+        <button
+          type="button"
+          className={`btn ${
+            sayfaTab === 'liste' ? 'btn--primary' : 'btn--secondary'
+          }`}
+          onClick={() => setSayfaTab('liste')}
         >
-          <option value="ALL">Tüm kategoriler</option>
-          {KATEGORI_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={durumFilter}
-          onChange={(e) => setDurumFilter(e.target.value as DurumFilter)}
+          Kıymet Listesi
+        </button>
+        <button
+          type="button"
+          className={`btn ${
+            sayfaTab === 'rapor' ? 'btn--primary' : 'btn--secondary'
+          }`}
+          onClick={() => setSayfaTab('rapor')}
         >
-          <option value="ALL">Tüm durumlar</option>
-          {DURUM_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+          Amortisman Raporu
+        </button>
       </div>
 
-      {items.length === 0 ? (
-        <div className="sabit-kiymet-list__empty">
-          <p>Henüz hiç kayıt yok.</p>
-          <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
-            İlk kaydı ekle
-          </Link>
-        </div>
-      ) : (
+      {sayfaTab === 'liste' && (
+        <>
+          <div className="sabit-kiymet-list__filters">
+            <input
+              type="text"
+              placeholder="Ad ara…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <select
+              value={kategoriFilter}
+              onChange={(e) =>
+                setKategoriFilter(e.target.value as KategoriFilter)
+              }
+            >
+              <option value="ALL">Tüm kategoriler</option>
+              {KATEGORI_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <select
+              value={durumFilter}
+              onChange={(e) => setDurumFilter(e.target.value as DurumFilter)}
+            >
+              <option value="ALL">Tüm durumlar</option>
+              {DURUM_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="sabit-kiymet-list__empty">
+              <p>Henüz hiç kayıt yok.</p>
+              <Link to="/sabit-kiymet/yeni" className="btn btn--primary">
+                İlk kaydı ekle
+              </Link>
+            </div>
+          ) : (
+            <div className="sabit-kiymet-list__table-wrapper">
+              <table className="sabit-kiymet-list__table">
+                <thead>
+                  <tr>
+                    <th>Ad</th>
+                    <th>Kategori</th>
+                    <th>Durum</th>
+                    <th>Alış Tarihi</th>
+                    <th>Alış Bedeli</th>
+                    <th>Şube</th>
+                    <th>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={7}>
+                        Arama/filtre kriterlerine uyan kayıt bulunamadı.
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.ad}</td>
+                        <td>{KATEGORI_LABEL[item.kategori]}</td>
+                        <td>{DURUM_LABEL[item.durum]}</td>
+                        <td>{formatTarih(item.alisTarihi)}</td>
+                        <td>{formatPara(item.alisBedeli)}</td>
+                        <td>{item.subeAdi || '—'}</td>
+                        <td>
+                          <div className="sabit-kiymet-list__table__actions">
+                            <Link
+                              to={`/sabit-kiymet/${item.id}`}
+                              className="btn btn--ghost"
+                            >
+                              Düzenle
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="btn btn--danger"
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+
+
+      {sayfaTab === 'rapor' && (
         <div className="sabit-kiymet-list__table-wrapper">
+          <div style={{ padding: '16px' }}>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>
+              Toplam {items.length} kayıt · Toplam Alış Bedeli:{' '}
+              <strong style={{ color: '#3b82f6' }}>
+                {formatPara(toplamAlisBedeli)}
+              </strong>{' '}
+              · Toplam Yıllık Amortisman:{' '}
+              <strong style={{ color: '#3b82f6' }}>
+                {formatPara(toplamYillikAmortisman)}
+              </strong>
+            </p>
+          </div>
           <table className="sabit-kiymet-list__table">
             <thead>
               <tr>
                 <th>Ad</th>
-                <th>Kategori</th>
-                <th>Durum</th>
-                <th>Alış Tarihi</th>
                 <th>Alış Bedeli</th>
-                <th>Şube</th>
-                <th>İşlemler</th>
+                <th>Oran (%)</th>
+                <th>Yıllık Amortisman</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {items.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>
-                    Arama/filtre kriterlerine uyan kayıt bulunamadı.
-                  </td>
+                  <td colSpan={4}>Kayıt bulunamadı.</td>
                 </tr>
               ) : (
-                filtered.map((item) => (
+                items.map((item) => (
                   <tr key={item.id}>
                     <td>{item.ad}</td>
-                    <td>{KATEGORI_LABEL[item.kategori]}</td>
-                    <td>{DURUM_LABEL[item.durum]}</td>
-                    <td>{formatTarih(item.alisTarihi)}</td>
                     <td>{formatPara(item.alisBedeli)}</td>
-                    <td>{item.subeAdi || '—'}</td>
+                    <td>{item.amortismanOrani}</td>
                     <td>
-                      <div className="sabit-kiymet-list__table__actions">
-                        <Link
-                          to={`/sabit-kiymet/${item.id}`}
-                          className="btn btn--ghost"
-                        >
-                          Düzenle
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="btn btn--danger"
-                        >
-                          Sil
-                        </button>
-                      </div>
+                      {formatPara(
+                        hesaplaYillikAmortisman(
+                          item.alisBedeli,
+                          item.amortismanOrani,
+                        ),
+                      )}
                     </td>
                   </tr>
                 ))
